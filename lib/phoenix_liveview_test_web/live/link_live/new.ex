@@ -1,16 +1,13 @@
-defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
+defmodule PhoenixLiveviewTestWeb.LinkLive.New do
   use PhoenixLiveviewTestWeb, :live_view
 
   alias PhoenixLiveviewTest.Links
 
-  @impl true
   def mount(_params, _session, socket) do
-    user_id = socket.assigns.current_user.id
     changeset = Links.Link.changeset(%Links.Link{})
 
     socket =
       socket
-      |> assign(:links, Links.list_links(user_id))
       |> assign(:form, to_form(changeset))
 
     {:ok, socket}
@@ -24,10 +21,11 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     IO.inspect(params)
 
     case Links.create_link(params) do
-      {:ok, link} ->
+      {:ok, _link} ->
         socket =
           socket
-          |> assign(:links, [link | socket.assigns.links])
+          |> put_flash(:info, "Link created foo!")
+          |> push_navigate(to: ~p"/links")
 
         {:noreply, socket}
 
