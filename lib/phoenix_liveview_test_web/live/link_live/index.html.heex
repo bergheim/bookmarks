@@ -1,23 +1,41 @@
 <div class="flex gap-2">
-<h1 class="grow text-2xl font-bold">Links</h1>
+  <h1 class="grow text-2xl font-bold">Links</h1>
 
-<div>
-<.link navigate={~p"/links/new"}
-  class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md"
+  <div>
+    <.link navigate={~p"/links/new"}
+      class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md"
+    >
+      Add link
+    </.link>
+  </div>
+
+</div>
+
+<ul>
+  <li :for={link <- @links}
+    class="mb-6"
 >
-  Add link
-  </.link>
-</div>
-
-</div>
-
-<div :for={link <- @links}>
-  <%= link.url %>
-</div>
+    <h2>
+      <a href={link.url}
+        class="text-blue-400"
+> <%= link.url %> </a>
+    </h2>
+    <div><%= link.inserted_at %></div>
+    <div><%= if link.body, do: link.body %></div>
+    <.link
+      phx-value-id={link.id}
+      phx-click="delete_link"
+      class="text-red-600"
+>
+      Delete
+    </.link>
+  </li>
+</ul>
 
 <.form
   for={@form}
   phx-submit="submit"
+  phx-blur="validate"
 >
   <div class="gap-2 items-end">
     <div class="flex-grow">
@@ -25,11 +43,11 @@
       <.input field={@form[:body]} type="textarea" label="Description" />
     </div>
     <div>
-    <button
-      class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
-      Save
-    </button>
-  </div>
+      <button
+        class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
+        Save
+      </button>
+    </div>
   </div>
 
 </.form>
