@@ -22,6 +22,19 @@ defmodule PhoenixLiveviewTest.Links do
   #   Repo.all(Link)
   # end
 
+  def list_links(user_id, search) do
+    search_term = "%#{search}%"
+
+    Repo.all(
+      from l in Link,
+        # ilike is not supported by sqlite3
+        # TODO: switch to ilike if we are on other dbs
+        where:
+          l.user_id == ^user_id and
+            (like(l.url, ^search_term) or like(l.body, ^search_term))
+    )
+  end
+
   def list_links(user_id) do
     Repo.all(
       from l in Link,

@@ -11,6 +11,36 @@
 
 </div>
 
+<.form
+  for={@form}
+  phx-submit="submit"
+  phx-blur="validate"
+>
+  <div class="gap-2 items-end">
+    <div class="flex-grow">
+      <.input field={@form[:url]} type="text" label="URL" />
+      <.input field={@form[:body]} type="textarea" label="Description" />
+    </div>
+    <div>
+      <button
+        class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
+        Save
+      </button>
+    </div>
+  </div>
+</.form>
+
+<div>
+
+<form phx-change="filter_links" phx-debounce="300">
+  <label for="filter">Filter:</label>
+  <input type="text" id="filter" name="filter"
+    value={@filter}
+    placeholder="Filter links..."
+ />
+</form>
+</div>
+
 <ul>
   <li :for={link <- @links}
     class="mb-6"
@@ -31,23 +61,3 @@
     </.link>
   </li>
 </ul>
-
-<.form
-  for={@form}
-  phx-submit="submit"
-  phx-blur="validate"
->
-  <div class="gap-2 items-end">
-    <div class="flex-grow">
-      <.input field={@form[:url]} type="text" label="URL" />
-      <.input field={@form[:body]} type="textarea" label="Description" />
-    </div>
-    <div>
-      <button
-        class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
-        Save
-      </button>
-    </div>
-  </div>
-
-</.form>

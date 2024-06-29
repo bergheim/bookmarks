@@ -13,6 +13,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
       socket
       |> assign(:links, Links.list_links(user_id))
       |> assign(:form, to_form(changeset))
+      |> assign(:filter, "")
 
     {:ok, socket}
   end
@@ -28,15 +29,6 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     link_params =
       link_params
       |> Map.put("user_id", user_id)
-
-    IO.inspect(changeset.data)
-
-    link_exists =
-      Links.list_links(user_id)
-      |> Enum.any?(fn link -> link.url == link_params["url"] end)
-
-    IO.inspect(link_exists)
-    IO.inspect(link_params)
 
     case Links.create_link(link_params) do
       {:ok, link} ->
@@ -77,20 +69,16 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
      |> assign(:links, Links.list_links(user_id))}
   end
 
-  # def handle_event("validate", %{"link" => link_params}, socket) do
-  #   changeset = Links.Link.changeset(%Links.Link{})
-  #   IO.inspect(link_params)
+  @impl Phoenix.LiveView
+  def handle_event("filter_links", %{"filter" => filter}, socket) do
+    user_id = socket.assigns.current_user.id
+    links = Links.list_links(user_id, filter)
 
-  #   socket =
-  #     socket
-  #     |> to_form(action: :validate)
-  #     |> assign(
-  #       :form,
-  #       to_form(changeset)
-  #     )
+    IO.puts("filter")
+    IO.inspect(links)
 
-  #   {:noreply, socket}
-  # end
+    {:noreply, assign(socket, links: links, filter: filter)}
+  end
 
   defp format_date(datetime) do
     datetime
