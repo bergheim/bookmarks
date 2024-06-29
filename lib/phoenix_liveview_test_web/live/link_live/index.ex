@@ -40,9 +40,12 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
 
     case Links.create_link(link_params) do
       {:ok, link} ->
+        changeset = Links.Link.changeset(%Links.Link{})
+
         socket =
           socket
           |> assign(:links, [link | socket.assigns.links])
+          |> assign(:form, to_form(changeset))
 
         {:noreply, socket}
 

@@ -58,32 +58,9 @@ defmodule PhoenixLiveviewTest.Links do
 
   """
   def create_link(attrs \\ %{}) do
-    link =
-      %Link{}
-      |> Link.changeset(attrs)
-
-    IO.puts("create_link")
-    IO.inspect(link)
-
-    link
+    %Link{}
+    |> Link.changeset(attrs)
     |> Repo.insert()
-
-    # exists? =
-    #   list_links(attrs["user_id"])
-    #   |> Enum.any?(fn l ->
-    #     l.url ==
-    #       link.changes.url
-    #   end)
-
-    # if exists? do
-    #   # %Link{}
-    #   # |> Link.changeset(attrs)
-    #   # Ecto.Changeset.add_error(link, :url, "has already been taken")
-    #   {:error, Ecto.Changeset.add_error(link, :url, "has already been taken")}
-    # else
-    #   link
-    #   |> Repo.insert()
-    # end
   end
 
   @doc """
