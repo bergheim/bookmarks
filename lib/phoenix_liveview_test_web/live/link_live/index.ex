@@ -46,6 +46,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
           socket
           |> assign(:links, [link | socket.assigns.links])
           |> assign(:form, to_form(changeset))
+          |> put_flash(:info, "Link added successfully")
 
         {:noreply, socket}
 
