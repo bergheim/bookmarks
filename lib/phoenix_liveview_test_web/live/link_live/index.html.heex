@@ -20,7 +20,7 @@
         class="text-blue-400"
 > <%= link.url %> </a>
     </h2>
-    <div><%= link.inserted_at %></div>
+    <div><%= format_date(link.inserted_at) %></div>
     <div><%= if link.body, do: link.body %></div>
     <.link
       phx-value-id={link.id}

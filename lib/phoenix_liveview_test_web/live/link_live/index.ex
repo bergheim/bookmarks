@@ -1,5 +1,6 @@
 defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
   use PhoenixLiveviewTestWeb, :live_view
+  use Timex
 
   alias PhoenixLiveviewTest.Links
 
@@ -18,13 +19,26 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
 
   @impl Phoenix.LiveView
   def handle_event("submit", %{"link" => link_params}, socket) do
-    params =
+    user_id = socket.assigns.current_user.id
+
+    changeset =
+      %Links.Link{}
+      |> Links.Link.changeset(Map.put(link_params, "user_id", user_id))
+
+    link_params =
       link_params
-      |> Map.put("user_id", socket.assigns.current_user.id)
+      |> Map.put("user_id", user_id)
 
-    IO.inspect(params)
+    IO.inspect(changeset.data)
 
-    case Links.create_link(params) do
+    link_exists =
+      Links.list_links(user_id)
+      |> Enum.any?(fn link -> link.url == link_params["url"] end)
+
+    IO.inspect(link_exists)
+    IO.inspect(link_params)
+
+    case Links.create_link(link_params) do
       {:ok, link} ->
         socket =
           socket
@@ -73,4 +87,10 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
 
   #   {:noreply, socket}
   # end
+
+  defp format_date(datetime) do
+    datetime
+    # TODO: this should use a locale..
+    |> Timex.format!("{D}/{M}/{YY} {h24}:{m}")
+  end
 end

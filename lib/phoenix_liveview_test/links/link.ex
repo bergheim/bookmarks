@@ -21,11 +21,6 @@ defmodule PhoenixLiveviewTest.Links.Link do
     end)
   end
 
-  defp foo(change) do
-    IO.inspect(change)
-    change
-  end
-
   @doc false
   def changeset(link, attrs \\ %{}) do
     link
@@ -33,7 +28,6 @@ defmodule PhoenixLiveviewTest.Links.Link do
     |> validate_required([:url, :user_id])
     |> validate_format(:url, ~r/.*\w\.\w/)
     |> add_protocol()
-
-    # |> validate_format(:url, ~r/@/)
+    |> unique_constraint(:url)
   end
 end
