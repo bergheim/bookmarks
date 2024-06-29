@@ -51,7 +51,7 @@
 > <%= link.url %> </a>
     </h2>
     <div><%= format_date(link.inserted_at) %></div>
-    <div><%= if link.body, do: link.body %></div>
+    <div><%= if link.body, do: raw(String.replace(link.body, "\n", "<br>")) %></div>
     <.link
       phx-value-id={link.id}
       phx-click="delete_link"

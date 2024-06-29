@@ -18,8 +18,6 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.New do
       link_params
       |> Map.put("user_id", socket.assigns.current_user.id)
 
-    IO.inspect(params)
-
     case Links.create_link(params) do
       {:ok, _link} ->
         socket =

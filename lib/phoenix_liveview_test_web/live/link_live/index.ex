@@ -74,9 +74,6 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     user_id = socket.assigns.current_user.id
     links = Links.list_links(user_id, filter)
 
-    IO.puts("filter")
-    IO.inspect(links)
-
     {:noreply, assign(socket, links: links, filter: filter)}
   end
 
