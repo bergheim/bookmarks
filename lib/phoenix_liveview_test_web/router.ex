@@ -72,6 +72,8 @@ defmodule PhoenixLiveviewTestWeb.Router do
       live "/links", LinkLive.Index
       live "/links/new", LinkLive.New
     end
+
+    get "/images/:id", ImageController, :show
   end
 
   scope "/", PhoenixLiveviewTestWeb do

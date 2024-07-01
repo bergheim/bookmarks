@@ -9,12 +9,12 @@
   </div>
 </div>
 
-<.form for={@form} phx-submit="submit" phx-blur="validate">
+<.form for={@form} phx-submit="submit" phx-blur="validate" phx-change="validate">
   <div class="items-end gap-2">
     <div class="flex-grow">
       <.input field={@form[:url]} value={strip_protocol(@form[:url].value)} type="text" label="URL" />
       <.input field={@form[:body]} type="textarea" label="Description" />
-      <.input field={@form[:image]} type="file" label="Image" id="image" />
+      <.live_file_input upload={@uploads.avatar} />
     </div>
     <div>
       <button class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
@@ -24,28 +24,61 @@
   </div>
 </.form>
 
-<div class="my-6">
-  <form phx-change="filter_links" phx-debounce="300">
-    <label for="filter">Filter:</label>
-    <input type="text" id="filter" name="filter" value={@filter} placeholder="Filter links..." />
-  </form>
-</div>
 
-<ul>
-  <li :for={link <- @links} class="mb-6">
-    <h2>
-      <a href={link.url} class="text-blue-400">
-        <%= strip_protocol(link.url) %>
-      </a>
-    </h2>
-    <div>
-      <%= format_date(link.inserted_at) %>
+<%= for entry <- @uploads.avatar.entries do %>
+  <article class="upload-entry">
+    <figure>
+      <.live_img_preview entry={entry} />
+      <figcaption>
+        <%= entry.client_name %>
+      </figcaption>
+    </figure>
+
+    <%!-- entry.progress will update automatically for in-flight entries --%>
+      <progress value={entry.progress} max="100">
+        <%= entry.progress %>%
+      </progress>
+
+      <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
+        <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">&times;</button>
+
+        <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
+          <%= for err <- upload_errors(@uploads.avatar, entry) do %>
+            <p class="alert alert-danger">
+              <%= error_to_string(err) %>
+            </p>
+            <% end %>
+  </article>
+  <% end %>
+
+    <div class="my-6">
+      <form phx-change="filter_links" phx-debounce="300">
+        <label for="filter">Filter:</label>
+        <input type="text" id="filter" name="filter" value={@filter} placeholder="Filter links..." />
+      </form>
     </div>
-    <div>
-      <%= if link.body, do: raw(String.replace(link.body, "\n" , "<br>" )) %>
-    </div>
-    <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
-      Delete
-    </.link>
-  </li>
-</ul>
+
+    <ul>
+      <li :for={link <- @links} class="mb-6">
+        <h2>
+          <a href={link.url} class="text-blue-400">
+            <%= strip_protocol(link.url) %>
+          </a>
+        </h2>
+        <div>
+          <%= format_date(link.inserted_at) %>
+        </div>
+        <div>
+          <%= if link.body, do: raw(String.replace(link.body, "\n" , "<br>" )) %>
+        </div>
+        <div>
+
+          <%= if link.image do %>
+            <img src={~p"/images/#{link.id}"} alt="Image" />
+            <% end %>
+        </div>
+        <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
+          Delete
+        </.link>
+      </li>
+    </ul>
