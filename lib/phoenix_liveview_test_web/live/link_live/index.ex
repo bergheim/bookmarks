@@ -14,6 +14,8 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
       |> assign(:links, Links.list_links(user_id))
       |> assign(:form, to_form(changeset))
       |> assign(:filter, "")
+      |> assign(:uploaded_files, [])
+      |> allow_upload(:avatar, accept: ~w(.jpg .jpeg), max_entries: 2)
 
     {:ok, socket}
   end
@@ -22,13 +24,21 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
   def handle_event("submit", %{"link" => link_params}, socket) do
     user_id = socket.assigns.current_user.id
 
-    changeset =
-      %Links.Link{}
-      |> Links.Link.changeset(Map.put(link_params, "user_id", user_id))
+    IO.inspect(link_params)
 
     link_params =
       link_params
       |> Map.put("user_id", user_id)
+      |> Map.update("image", nil, fn image_upload ->
+        if image_upload do
+          {:ok, binary} = File.read(image_upload.path)
+          binary
+        else
+          nil
+        end
+      end)
+
+    IO.inspect(link_params)
 
     case Links.create_link(link_params) do
       {:ok, link} ->
@@ -81,5 +91,15 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     datetime
     # TODO: this should use a locale..
     |> Timex.format!("{D}/{M}/{YY} {h24}:{m}")
+  end
+
+  defp strip_protocol(nil), do: nil
+
+  defp strip_protocol(url) do
+    IO.puts("url")
+    IO.inspect(url)
+
+    url
+    |> String.replace(~r{^https?://}, "")
   end
 end

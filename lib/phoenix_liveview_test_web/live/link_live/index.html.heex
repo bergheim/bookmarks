@@ -1,62 +1,50 @@
 <div class="flex gap-2">
-  <h1 class="grow text-2xl font-bold">Links</h1>
+  <h1 class="grow text-2xl font-bold">Bookmarks</h1>
 
   <div>
     <.link navigate={~p"/links/new"}
-      class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md"
-    >
+      class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
       Add link
     </.link>
   </div>
-
 </div>
 
-<.form
-  for={@form}
-  phx-submit="submit"
-  phx-blur="validate"
->
-  <div class="gap-2 items-end">
+<.form for={@form} phx-submit="submit" phx-blur="validate">
+  <div class="items-end gap-2">
     <div class="flex-grow">
-      <.input field={@form[:url]} type="text" label="URL" />
+      <.input field={@form[:url]} value={strip_protocol(@form[:url].value)} type="text" label="URL" />
       <.input field={@form[:body]} type="textarea" label="Description" />
+      <.input field={@form[:image]} type="file" label="Image" id="image" />
     </div>
     <div>
-      <button
-        class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
+      <button class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
         Save
       </button>
     </div>
   </div>
 </.form>
 
-<div>
-
-<form phx-change="filter_links" phx-debounce="300">
-  <label for="filter">Filter:</label>
-  <input type="text" id="filter" name="filter"
-    value={@filter}
-    placeholder="Filter links..."
- />
-</form>
+<div class="my-6">
+  <form phx-change="filter_links" phx-debounce="300">
+    <label for="filter">Filter:</label>
+    <input type="text" id="filter" name="filter" value={@filter} placeholder="Filter links..." />
+  </form>
 </div>
 
 <ul>
-  <li :for={link <- @links}
-    class="mb-6"
->
+  <li :for={link <- @links} class="mb-6">
     <h2>
-      <a href={link.url}
-        class="text-blue-400"
-> <%= link.url %> </a>
+      <a href={link.url} class="text-blue-400">
+        <%= strip_protocol(link.url) %>
+      </a>
     </h2>
-    <div><%= format_date(link.inserted_at) %></div>
-    <div><%= if link.body, do: raw(String.replace(link.body, "\n", "<br>")) %></div>
-    <.link
-      phx-value-id={link.id}
-      phx-click="delete_link"
-      class="text-red-600"
->
+    <div>
+      <%= format_date(link.inserted_at) %>
+    </div>
+    <div>
+      <%= if link.body, do: raw(String.replace(link.body, "\n" , "<br>" )) %>
+    </div>
+    <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
       Delete
     </.link>
   </li>
