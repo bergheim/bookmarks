@@ -71,9 +71,23 @@ defmodule PhoenixLiveviewTest.Links do
 
   """
   def create_link(attrs \\ %{}) do
-    %Link{}
-    |> Link.changeset(attrs)
-    |> Repo.insert()
+    link =
+      %Link{}
+      |> Link.changeset(attrs)
+      |> Repo.insert()
+
+    IO.inspect(link)
+
+    if attrs["image"] do
+      # Create an image from the link
+      image =
+        Ecto.build_assoc(link, :image,
+          path: attrs["image"]["path"],
+          image: attrs["image"]["image"]
+        )
+
+      Repo.insert(image)
+    end
   end
 
   @doc """

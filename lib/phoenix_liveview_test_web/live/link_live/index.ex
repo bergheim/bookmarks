@@ -27,11 +27,24 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     uploaded_files =
       consume_uploaded_entries(socket, :avatar, fn %{path: path}, _entry ->
         # TODO use files for this after db test is done
-        # dest = Path.join([:code.priv_dir(:phoenix_liveview_test), "static", "uploads", Path.basename(path)])
+        dest =
+          Path.join([
+            :code.priv_dir(:phoenix_liveview_test),
+            "static",
+            "uploads",
+            Path.basename(path)
+          ])
+
         # You will need to create `priv/static/uploads` for `File.cp!/2` to work.
+        File.cp!(path, dest)
+
         contents = File.read!(path)
-        {:ok, contents}
+
+        {:ok, %{path: ~p"/images/#{Path.basename(dest)}", image: contents}}
       end)
+
+    IO.puts("uploaded_files")
+    IO.inspect(uploaded_files)
 
     link_params =
       link_params

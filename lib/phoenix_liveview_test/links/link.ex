@@ -9,6 +9,7 @@ defmodule PhoenixLiveviewTest.Links.Link do
     field :image, :binary
 
     belongs_to :user, PhoenixLiveviewTest.Users.User
+    has_one :images, PhoenixLiveviewTest.Links.Image
 
     timestamps(type: :utc_datetime)
   end

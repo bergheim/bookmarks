@@ -1,7 +1,7 @@
 defmodule PhoenixLiveviewTestWeb.ImageController do
   use PhoenixLiveviewTestWeb, :controller
 
-  alias PhoenixLiveviewTest.Repo
+  # alias PhoenixLiveviewTest.Repo
   alias PhoenixLiveviewTest.Links
 
   def show(conn, %{"id" => id}) do
