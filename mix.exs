@@ -32,6 +32,7 @@ defmodule PhoenixLiveviewTest.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7"},
       {:timex, "~> 3.7"},
       {:bcrypt_elixir, "~> 3.0"},
