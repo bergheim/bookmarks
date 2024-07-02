@@ -25,6 +25,16 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     {:ok, socket}
   end
 
+  def handle_params(%{"id" => id}, _url, socket) do
+    link = Links.get_link!(id)
+    changeset = Links.change_link(link)
+    {:noreply, assign(socket, change_form: to_form(changeset), show_modal: true)}
+  end
+
+  def handle_params(_params, _url, socket) do
+    {:noreply, assign(socket, show_modal: false)}
+  end
+
   @impl Phoenix.LiveView
   def handle_event("submit", %{"link" => link_params}, socket) do
     user_id = socket.assigns.current_user.id
@@ -113,11 +123,13 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     changeset = Links.Link.changeset(link)
     # changeset = Links.Link.changeset(%Links.Link{})
 
-    {:noreply,
-     socket
-     # |> assign(:links, Links.list_links(user_id))
-     |> assign(:change_form, to_form(changeset))
-     |> assign(:show_modal, true)}
+    {
+      :noreply,
+      socket
+      |> assign(:change_form, to_form(changeset))
+      |> assign(:show_modal, true)
+      |> push_patch(to: ~p"/links/#{id}")
+    }
   end
 
   @impl Phoenix.LiveView
@@ -139,6 +151,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
          socket
          |> assign(:show_modal, false)
          |> assign(links: Links.list_links(user_id, filter))
+         |> push_patch(to: ~p"/links")
          |> put_flash(:info, "Link updated successfully")}
 
       {:error, changeset} ->
@@ -157,7 +170,10 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
 
   @impl Phoenix.LiveView
   def handle_event("close_modal", _params, socket) do
-    {:noreply, assign(socket, show_modal: false)}
+    {:noreply,
+     socket
+     |> assign(:show_modal, false)
+     |> push_patch(to: ~p"/links")}
   end
 
   @impl Phoenix.LiveView

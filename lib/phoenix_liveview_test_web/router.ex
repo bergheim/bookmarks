@@ -69,8 +69,9 @@ defmodule PhoenixLiveviewTestWeb.Router do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
-      live "/links", LinkLive.Index
+      live "/links", LinkLive.Index, :index
       live "/links/new", LinkLive.New
+      live "/links/:id", LinkLive.Index, :change_link
     end
 
     get "/images/:id", ImageController, :show
