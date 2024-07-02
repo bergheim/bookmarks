@@ -14,10 +14,10 @@
     <div class="flex-grow">
       <.input field={@form[:url]} value={strip_protocol(@form[:url].value)} type="text" label="URL" />
       <.input field={@form[:body]} type="textarea" label="Description" />
-      <.live_file_input upload={@uploads.avatar} />
+      <.live_file_input upload={@uploads.avatar} class="my-4" />
     </div>
     <div>
-      <button class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
+      <button class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700 my-4">
         Save
       </button>
     </div>
@@ -67,6 +67,9 @@
             <%= strip_protocol(link.url) %>
           </a>
         </h2>
+        <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
+          Delete
+        </.link>
         <div>
           <%= format_date(link.inserted_at) %>
         </div>
@@ -78,8 +81,5 @@
             <img src={~p"/images/#{link.id}"} alt="Image" />
             <% end %>
         </div>
-        <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
-          Delete
-        </.link>
       </li>
     </ul>

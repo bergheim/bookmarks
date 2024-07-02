@@ -123,6 +123,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
     {:noreply, cancel_upload(socket, :avatar, ref)}
   end
 
+  # TODO used?
   @impl Phoenix.LiveView
   def handle_event("save", _params, socket) do
     uploaded_files =
