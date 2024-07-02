@@ -66,8 +66,6 @@ defmodule PhoenixLiveviewTest.Links do
   def get_link!(id) do
     Link
     |> Repo.get!(id)
-    # Preload the associated image
-    |> Repo.preload(:image)
   end
 
   @doc """
@@ -101,6 +99,7 @@ defmodule PhoenixLiveviewTest.Links do
       end
     end)
     |> Repo.transaction()
+    |> IO.inspect()
     |> case do
       {:ok, %{link: link}} -> {:ok, link}
       {:error, _operation, reason, _changes} -> {:error, reason}

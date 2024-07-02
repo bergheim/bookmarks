@@ -11,7 +11,8 @@ defmodule PhoenixLiveviewTest.LinksTest do
     @invalid_attrs %{body: nil, url: nil}
 
     test "list_links/0 returns all links" do
-      link = link_fixture()
+      user = PhoenixLiveviewTest.UsersFixtures.user_fixture()
+      link = link_fixture(user.id)
       assert Links.list_links() == [link]
     end
 
@@ -21,11 +22,12 @@ defmodule PhoenixLiveviewTest.LinksTest do
     end
 
     test "create_link/1 with valid data creates a link" do
-      valid_attrs = %{body: "some body", url: "some url"}
+      user_fixture = PhoenixLiveviewTest.UsersFixtures.user_fixture()
+      valid_attrs = %{body: "some body", url: "some.url", user_id: user_fixture.id}
 
       assert {:ok, %Link{} = link} = Links.create_link(valid_attrs)
       assert link.body == "some body"
-      assert link.url == "some url"
+      assert link.url == "https://some.url"
     end
 
     test "create_link/1 with invalid data returns error changeset" do
@@ -34,11 +36,11 @@ defmodule PhoenixLiveviewTest.LinksTest do
 
     test "update_link/2 with valid data updates the link" do
       link = link_fixture()
-      update_attrs = %{body: "some updated body", url: "some updated url"}
+      update_attrs = %{body: "some updated body", url: "some.updated.url"}
 
       assert {:ok, %Link{} = link} = Links.update_link(link, update_attrs)
       assert link.body == "some updated body"
-      assert link.url == "some updated url"
+      assert link.url == "https://some.updated.url"
     end
 
     test "update_link/2 with invalid data returns error changeset" do

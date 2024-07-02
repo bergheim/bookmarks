@@ -3,6 +3,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
 
   import Phoenix.LiveViewTest
   import PhoenixLiveviewTest.LinksFixtures
+  import PhoenixLiveviewTest.UsersFixtures
 
   @create_attrs %{body: "some body", url: "some url"}
   @update_attrs %{body: "some updated body", url: "some updated url"}
@@ -13,13 +14,20 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
     %{link: link}
   end
 
+  defp login_user(%{conn: conn}) do
+    user = user_fixture()
+    conn = log_in_user(conn, user)
+    {:ok, conn: conn, user: user}
+  end
+
+  @tag :this
   describe "Index" do
-    setup [:create_link]
+    setup [:login_user, :create_link]
 
     test "lists all links", %{conn: conn, link: link} do
       {:ok, _index_live, html} = live(conn, ~p"/links")
 
-      assert html =~ "Listing Links"
+      assert html =~ "Bookmarks"
       assert html =~ link.body
     end
 
