@@ -23,63 +23,109 @@
     </div>
   </div>
 </.form>
-
-<%= for entry <- @uploads.avatar.entries do %>
-  <article class="upload-entry">
-    <figure>
-      <.live_img_preview entry={entry} />
-      <figcaption>
-        <%= entry.client_name %>
-      </figcaption>
-    </figure>
-
-    <%!-- entry.progress will update automatically for in-flight entries --%>
-      <progress value={entry.progress} max="100">
-        <%= entry.progress %>%
-      </progress>
-
-      <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
-        <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">
-          &times;
-        </button>
-
-        <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
-          <%= for err <- upload_errors(@uploads.avatar, entry) do %>
-            <p class="alert alert-danger">
-              <%= error_to_string(err) %>
-            </p>
-            <% end %>
-  </article>
+<!-- Modal Overlay -->
+<%= if @show_modal do %>
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40"></div>
   <% end %>
+    <!-- Modal Container -->
+    <%= if @show_modal do %>
+      <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 text-center">
+          <div
+            class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="sm:flex sm:items-start">
+                <!-- Modal Form -->
+                <.form for={@change_form} phx-submit="update_link" phx-change="validate">
+                  <div class="items-end gap-2">
+                    <div class="flex-grow">
+                      <.input field={@change_form[:id]} value={@change_form[:id].value} type="hidden" />
+                      <.input field={@change_form[:url]} value={strip_protocol(@change_form[:url].value)} type="text"
+                        label="URL" />
+                      <.input field={@change_form[:body]} type="textarea" label="Description" />
+                    </div>
+                    <div>
+                      <button
+                        class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700 my-4">
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </.form>
+              </div>
+            </div>
+            <!-- Modal Actions -->
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button type="button" phx-click="close_modal" class="mt-3 w-full inline-flex justify-center rounded-md border 
+          border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none 
+          focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
 
-    <div class="my-6">
-      <form phx-change="filter_links" phx-debounce="300">
-        <label for="filter">Filter:</label>
-        <input type="text" id="filter" name="filter" value={@filter} placeholder="Filter links..." />
-      </form>
-    </div>
+        <%= for entry <- @uploads.avatar.entries do %>
+          <article class="upload-entry">
+            <figure>
+              <.live_img_preview entry={entry} />
+              <figcaption>
+                <%= entry.client_name %>
+              </figcaption>
+            </figure>
 
-    <h2 class="text-xl font-bold">Links (<%= Enum.count(@links) %>)</h2>
-    <ul>
-      <li :for={link <- @links} class="mb-6">
-        <h2>
-          <a href={link.url} class="text-blue-400">
-            <%= strip_protocol(link.url) %>
-          </a>
-        </h2>
-        <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
-          Delete
-        </.link>
-        <div>
-          <%= format_date(link.inserted_at) %>
-        </div>
-        <div>
-          <%= if link.body, do: raw(String.replace(link.body, "\n" , "<br>" )) %>
-        </div>
-        <div>
-          <%= if link.image do %>
-            <img src={~p"/images/#{link.id}"} alt="Image" />
-            <% end %>
-        </div>
-      </li>
-    </ul>
+            <%!-- entry.progress will update automatically for in-flight entries --%>
+              <progress value={entry.progress} max="100">
+                <%= entry.progress %>%
+              </progress>
+
+              <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
+                <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">
+                  &times;
+                </button>
+
+                <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
+                  <%= for err <- upload_errors(@uploads.avatar, entry) do %>
+                    <p class="alert alert-danger">
+                      <%= error_to_string(err) %>
+                    </p>
+                    <% end %>
+          </article>
+          <% end %>
+
+            <div class="my-6">
+              <form phx-change="filter_links" phx-debounce="300">
+                <label for="filter">Filter:</label>
+                <input type="text" id="filter" name="filter" value={@filter} placeholder="Filter links..." />
+              </form>
+            </div>
+
+            <h2 class="text-xl font-bold">Links (<%= Enum.count(@links) %>)</h2>
+            <ul>
+              <li :for={link <- @links} class="mb-6">
+                <h2>
+                  <a href={link.url} class="text-blue-400">
+                    <%= strip_protocol(link.url) %>
+                  </a>
+                </h2>
+                <.link phx-value-id={link.id} phx-click="delete_link" class="text-red-600">
+                  Delete
+                </.link>
+                <.link phx-value-id={link.id} phx-click="change_link" class="text-red-600">
+                  Change
+                </.link>
+                <div>
+                  <%= format_date(link.inserted_at) %>
+                </div>
+                <div>
+                  <%= if link.body, do: raw(String.replace(link.body, "\n" , "<br>" )) %>
+                </div>
+                <div>
+                  <%= if link.image do %>
+                    <img src={~p"/images/#{link.id}"} alt="Image" />
+                    <% end %>
+                </div>
+              </li>
+            </ul>

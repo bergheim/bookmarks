@@ -14,6 +14,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
       |> assign(:links, Links.list_links(user_id))
       |> assign(:form, to_form(changeset))
       |> assign(:filter, "")
+      |> assign(:show_modal, false)
       |> assign(:uploaded_files, [])
       |> allow_upload(:avatar, accept: ~w(.jpg .jpeg .png), max_entries: 1)
 
@@ -103,6 +104,60 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
      socket
      |> put_flash(:info, "Link deleted successfully")
      |> assign(:links, Links.list_links(user_id))}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("change_link", %{"id" => id}, socket) do
+    user_id = socket.assigns.current_user.id
+    link = Links.get_link!(id)
+    changeset = Links.Link.changeset(link)
+    # changeset = Links.Link.changeset(%Links.Link{})
+
+    {:noreply,
+     socket
+     # |> assign(:links, Links.list_links(user_id))
+     |> assign(:change_form, to_form(changeset))
+     |> assign(:show_modal, true)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event(
+        "update_link",
+        %{"link" => %{"id" => id, "url" => url, "body" => body}},
+        socket
+      ) do
+    user_id = socket.assigns.current_user.id
+    filter = socket.assigns.filter
+    IO.puts("maaaan")
+    IO.inspect(url)
+
+    link = Links.get_link!(id)
+
+    case Links.update_link(link, %{url: url, body: body}) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> assign(:show_modal, false)
+         |> assign(links: Links.list_links(user_id, filter))
+         |> put_flash(:info, "Link updated successfully")}
+
+      {:error, changeset} ->
+        IO.puts("Error updating link")
+
+        socket =
+          socket
+          |> assign(
+            :change_form,
+            to_form(changeset)
+          )
+
+        {:noreply, socket}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, assign(socket, show_modal: false)}
   end
 
   @impl Phoenix.LiveView

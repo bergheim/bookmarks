@@ -8,7 +8,7 @@ defmodule PhoenixLiveviewTest.LinksFixtures do
   Generate a link.
   """
   def link_fixture(attrs \\ %{}) do
-    user = PhoenixLiveviewTest.UsersFixtures.user_fixture()
+    user = attrs[:user] || PhoenixLiveviewTest.UsersFixtures.user_fixture()
 
     {:ok, link} =
       attrs

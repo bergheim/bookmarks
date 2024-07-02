@@ -9,8 +9,8 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
   @update_attrs %{body: "some updated body", url: "some updated url"}
   @invalid_attrs %{body: nil, url: nil}
 
-  defp create_link(_) do
-    link = link_fixture()
+  defp create_link(%{user: user}) do
+    link = link_fixture(%{user: user})
     %{link: link}
   end
 
@@ -20,7 +20,6 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
     {:ok, conn: conn, user: user}
   end
 
-  @tag :this
   describe "Index" do
     setup [:login_user, :create_link]
 
@@ -86,7 +85,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
   end
 
   describe "Show" do
-    setup [:create_link]
+    setup [:login_user, :create_link]
 
     test "displays link", %{conn: conn, link: link} do
       {:ok, _show_live, html} = live(conn, ~p"/links/#{link}")
@@ -95,6 +94,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
       assert html =~ link.body
     end
 
+    @tag :this
     test "updates link within modal", %{conn: conn, link: link} do
       {:ok, show_live, _html} = live(conn, ~p"/links/#{link}")
 
