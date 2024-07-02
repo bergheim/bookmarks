@@ -4,8 +4,8 @@ defmodule PhoenixLiveviewTestWeb.UserConfirmationLiveTest do
   import Phoenix.LiveViewTest
   import PhoenixLiveviewTest.UsersFixtures
 
-  alias PhoenixLiveviewTest.Users
   alias PhoenixLiveviewTest.Repo
+  alias PhoenixLiveviewTest.Users
 
   setup do
     %{user: user_fixture()}

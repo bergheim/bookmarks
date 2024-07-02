@@ -6,10 +6,9 @@ defmodule PhoenixLiveviewTest.Links.Link do
   schema "links" do
     field :body, :string
     field :url, :string
-    field :image, :binary
 
     belongs_to :user, PhoenixLiveviewTest.Users.User
-    has_one :images, PhoenixLiveviewTest.Links.Image
+    has_one :image, PhoenixLiveviewTest.Links.Image
 
     timestamps(type: :utc_datetime)
   end
@@ -26,7 +25,7 @@ defmodule PhoenixLiveviewTest.Links.Link do
   @doc false
   def changeset(link, attrs \\ %{}) do
     link
-    |> cast(attrs, [:url, :body, :image, :user_id])
+    |> cast(attrs, [:url, :body, :user_id])
     |> validate_required([:url, :user_id])
     |> validate_format(:url, ~r/.*\w\.\w/)
     |> add_protocol()

@@ -17,6 +17,10 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
       |> assign(:uploaded_files, [])
       |> allow_upload(:avatar, accept: ~w(.jpg .jpeg .png), max_entries: 1)
 
+    # IO.inspect(socket.assigns.links)
+
+    {:ok, socket}
+
     {:ok, socket}
   end
 
@@ -24,14 +28,18 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
   def handle_event("submit", %{"link" => link_params}, socket) do
     user_id = socket.assigns.current_user.id
 
+    # consume_uploaded_entries(socket, :avatar, fn meta ->
     uploaded_files =
-      consume_uploaded_entries(socket, :avatar, fn %{path: path}, _entry ->
+      consume_uploaded_entries(socket, :avatar, fn %{path: path}, entry ->
         # TODO use files for this after db test is done
+
         dest =
           Path.join([
-            :code.priv_dir(:phoenix_liveview_test),
+            # :code.priv_dir(:phoenix_liveview_test),
+            "priv",
             "static",
             "uploads",
+            "images",
             Path.basename(path)
           ])
 
@@ -40,11 +48,16 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
 
         contents = File.read!(path)
 
-        {:ok, %{path: ~p"/images/#{Path.basename(dest)}", image: contents}}
+        # TODO make these symbols
+        {:ok,
+         %{
+           # "path" => ~p"/images/#{Path.basename(dest)}",
+           "path" => dest,
+           "image" => contents,
+           "filename" => entry.client_name,
+           "filetype" => entry.client_type
+         }}
       end)
-
-    IO.puts("uploaded_files")
-    IO.inspect(uploaded_files)
 
     link_params =
       link_params
@@ -64,6 +77,8 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
         {:noreply, socket}
 
       {:error, changeset} ->
+        IO.puts("Error creating link")
+
         socket =
           socket
           |> assign(
@@ -115,7 +130,7 @@ defmodule PhoenixLiveviewTestWeb.LinkLive.Index do
         dest = Path.join([:code.priv_dir(:my_app), "static", "uploads", Path.basename(path)])
         # You will need to create `priv/static/uploads` for `File.cp!/2` to work.
         File.cp!(path, dest)
-        {:ok, ~p"/uploads/#{Path.basename(dest)}"}
+        {:ok, ~p"/images/#{Path.basename(dest)}"}
       end)
 
     {:noreply, update(socket, :uploaded_files, &(&1 ++ uploaded_files))}

@@ -6,6 +6,8 @@ defmodule PhoenixLiveviewTest.Links.Image do
   schema "images" do
     field :path, :string
     field :image, :binary
+    field :filetype, :string
+    field :filename, :string
 
     belongs_to :link, PhoenixLiveviewTest.Links.Link
 
@@ -15,8 +17,8 @@ defmodule PhoenixLiveviewTest.Links.Image do
   @doc false
   def changeset(link, attrs \\ %{}) do
     link
-    |> cast(attrs, [:path, :image])
-    |> validate_required([:path, :image])
+    |> cast(attrs, [:path, :image, :link_id, :filetype, :filename])
+    |> validate_required([:path, :image, :link_id, :filetype, :filename])
 
     # |> unique_constraint(:path)
   end

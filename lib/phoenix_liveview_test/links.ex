@@ -6,7 +6,7 @@ defmodule PhoenixLiveviewTest.Links do
   import Ecto.Query, warn: false
   alias PhoenixLiveviewTest.Repo
 
-  alias PhoenixLiveviewTest.Links.Link
+  alias PhoenixLiveviewTest.Links.{Image, Link}
 
   @doc """
   Returns the list of links.
@@ -31,14 +31,18 @@ defmodule PhoenixLiveviewTest.Links do
         # TODO: switch to ilike if we are on other dbs
         where:
           l.user_id == ^user_id and
-            (like(l.url, ^search_term) or like(l.body, ^search_term))
+            (like(l.url, ^search_term) or like(l.body, ^search_term)),
+        order_by: [desc: l.inserted_at],
+        preload: [:image]
     )
   end
 
   def list_links(user_id) do
     Repo.all(
       from l in Link,
-        where: l.user_id == ^user_id
+        where: l.user_id == ^user_id,
+        order_by: [desc: l.inserted_at],
+        preload: [:image]
     )
   end
 
@@ -56,7 +60,15 @@ defmodule PhoenixLiveviewTest.Links do
       ** (Ecto.NoResultsError)
 
   """
-  def get_link!(id), do: Repo.get!(Link, id)
+
+  # def get_link!(id), do: Repo.get!(Link, id, preload: [:image])
+
+  def get_link!(id) do
+    Link
+    |> Repo.get!(id)
+    # Preload the associated image
+    |> Repo.preload(:image)
+  end
 
   @doc """
   Creates a link.
@@ -71,22 +83,27 @@ defmodule PhoenixLiveviewTest.Links do
 
   """
   def create_link(attrs \\ %{}) do
-    link =
-      %Link{}
-      |> Link.changeset(attrs)
-      |> Repo.insert()
-
-    IO.inspect(link)
-
-    if attrs["image"] do
-      # Create an image from the link
-      image =
-        Ecto.build_assoc(link, :image,
-          path: attrs["image"]["path"],
-          image: attrs["image"]["image"]
-        )
-
-      Repo.insert(image)
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:link, Link.changeset(%Link{}, attrs))
+    |> Ecto.Multi.run(:image, fn repo, %{link: link} ->
+      if attrs["image"] do
+        %Image{}
+        |> Image.changeset(%{
+          "link_id" => link.id,
+          "path" => attrs["image"]["path"],
+          "image" => attrs["image"]["image"],
+          "filetype" => attrs["image"]["filetype"],
+          "filename" => attrs["image"]["filename"]
+        })
+        |> repo.insert()
+      else
+        {:ok, nil}
+      end
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{link: link}} -> {:ok, link}
+      {:error, _operation, reason, _changes} -> {:error, reason}
     end
   end
 
