@@ -1,20 +1,15 @@
 <div class="flex gap-2">Add URL</div>
 
-<.form
-  for={@form}
-  phx-submit="submit"
->
-  <div class="gap-2 items-end">
+<.form for={@form} phx-submit="submit">
+  <div class="items-end gap-2">
     <div class="flex-grow">
       <.input field={@form[:url]} type="text" label="URL" />
       <.input field={@form[:body]} type="textarea" label="Description" />
     </div>
     <div>
-    <button
-      class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
-      Save
-    </button>
+      <button class="bg-black border border-black text-white hover:bg-gray-700 py-2 px-3 rounded-md">
+        Save
+      </button>
+    </div>
   </div>
-  </div>
-
 </.form>

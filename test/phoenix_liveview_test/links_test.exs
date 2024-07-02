@@ -12,8 +12,8 @@ defmodule PhoenixLiveviewTest.LinksTest do
 
     test "list_links/0 returns all links" do
       user = PhoenixLiveviewTest.UsersFixtures.user_fixture()
-      link = link_fixture(user.id)
-      assert Links.list_links() == [link]
+      link = link_fixture(%{user: user})
+      assert Links.list_links(user.id) == [Map.put(link, :image, nil)]
     end
 
     test "get_link!/1 returns the link with given id" do

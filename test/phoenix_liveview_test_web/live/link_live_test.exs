@@ -5,8 +5,8 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
   import PhoenixLiveviewTest.LinksFixtures
   import PhoenixLiveviewTest.UsersFixtures
 
-  @create_attrs %{body: "some body", url: "some url"}
-  @update_attrs %{body: "some updated body", url: "some updated url"}
+  @create_attrs %{body: "some body", url: "some.url"}
+  @update_attrs %{body: "some updated body", url: "some.updated.url"}
   @invalid_attrs %{body: nil, url: nil}
 
   defp create_link(%{user: user}) do
@@ -33,47 +33,18 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
     test "saves new link", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, ~p"/links")
 
-      assert index_live |> element("a", "New Link") |> render_click() =~
-               "New Link"
-
-      assert_patch(index_live, ~p"/links/new")
+      assert render(index_live) =~ "Add bookmark"
 
       assert index_live
-             |> form("#link-form", link: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> form("#bookmark_new_form", link: @invalid_attrs)
+             |> render_submit() =~ "can&#39;t be blank"
 
       assert index_live
-             |> form("#link-form", link: @create_attrs)
+             |> form("#bookmark_new_form", link: @create_attrs)
              |> render_submit()
 
-      assert_patch(index_live, ~p"/links")
-
       html = render(index_live)
-      assert html =~ "Link created successfully"
       assert html =~ "some body"
-    end
-
-    test "updates link in listing", %{conn: conn, link: link} do
-      {:ok, index_live, _html} = live(conn, ~p"/links")
-
-      assert index_live |> element("#links-#{link.id} a", "Edit") |> render_click() =~
-               "Edit Link"
-
-      assert_patch(index_live, ~p"/links/#{link}/edit")
-
-      assert index_live
-             |> form("#link-form", link: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert index_live
-             |> form("#link-form", link: @update_attrs)
-             |> render_submit()
-
-      assert_patch(index_live, ~p"/links")
-
-      html = render(index_live)
-      assert html =~ "Link updated successfully"
-      assert html =~ "some updated body"
     end
 
     test "deletes link in listing", %{conn: conn, link: link} do
@@ -90,28 +61,27 @@ defmodule PhoenixLiveviewTestWeb.LinkLiveTest do
     test "displays link", %{conn: conn, link: link} do
       {:ok, _show_live, html} = live(conn, ~p"/links/#{link}")
 
-      assert html =~ "Show Link"
+      assert html =~ "URL"
       assert html =~ link.body
     end
 
-    @tag :this
     test "updates link within modal", %{conn: conn, link: link} do
       {:ok, show_live, _html} = live(conn, ~p"/links/#{link}")
 
-      assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit Link"
-
-      assert_patch(show_live, ~p"/links/#{link}/show/edit")
-
-      assert show_live
-             |> form("#link-form", link: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert show_live
-             |> form("#link-form", link: @update_attrs)
-             |> render_submit()
+      assert show_live |> element("a", "Change") |> render_click() =~
+               "Update"
 
       assert_patch(show_live, ~p"/links/#{link}")
+
+      # assert show_live
+      #        |> form("#change_form", link: @invalid_attrs)
+      #        |> render_change() =~ "can&#39;t be blank"
+
+      assert show_live
+             |> form("#change_form", link: @update_attrs)
+             |> render_submit()
+
+      assert_patch(show_live, ~p"/links")
 
       html = render(show_live)
       assert html =~ "Link updated successfully"

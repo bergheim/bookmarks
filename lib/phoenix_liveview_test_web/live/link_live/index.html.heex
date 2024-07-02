@@ -1,15 +1,14 @@
-<div class="flex gap-4 items-center">
+<div class="flex items-center gap-4">
   <h1 class="grow text-2xl font-bold">Bookmarks</h1>
 
   <div>
-    <.link navigate={~p"/links/new"}
-      class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
-      Add link
+    <.link href={~p"/links/new"} class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
+      Add linkz
     </.link>
   </div>
 </div>
 
-<.form for={@form} phx-submit="submit" phx-blur="validate" phx-change="validate">
+<.form for={@form} phx-submit="submit" phx-blur="validate" phx-change="validate" id="bookmark_new_form">
   <div class="items-end gap-2">
     <div class="flex-grow">
       <.input field={@form[:url]} value={strip_protocol(@form[:url].value)} type="text" label="URL" />
@@ -17,15 +16,15 @@
       <.live_file_input upload={@uploads.avatar} class="my-4" />
     </div>
     <div>
-      <button class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700 my-4">
-        Save
+      <button class="my-4 rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700">
+        Add bookmark
       </button>
     </div>
   </div>
 </.form>
 <!-- Modal Overlay -->
 <%= if @show_modal do %>
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40"></div>
+  <div class="fixed inset-0 z-40 bg-gray-500 bg-opacity-75 transition-opacity"></div>
   <% end %>
     <!-- Modal Container -->
     <%= if @show_modal do %>
@@ -36,7 +35,7 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
                 <!-- Modal Form -->
-                <.form for={@change_form} phx-submit="update_link" phx-change="validate">
+                <.form for={@change_form} id="change_form" phx-submit="update_link" phx-change="validate">
                   <div class="items-end gap-2">
                     <div class="flex-grow">
                       <.input field={@change_form[:id]} value={@change_form[:id].value} type="hidden" />
@@ -47,7 +46,7 @@
                     <div>
                       <button
                         class="rounded-md border border-black bg-black px-3 py-2 text-white hover:bg-gray-700 my-4">
-                        Save
+                        Update
                       </button>
                     </div>
                   </div>
@@ -104,7 +103,7 @@
 
             <h2 class="text-xl font-bold">Links (<%= Enum.count(@links) %>)</h2>
             <ul>
-              <li :for={link <- @links} class="mb-6">
+              <li :for={link <- @links} class="mb-6" id={"links-#{link.id}"}>
                 <h2>
                   <a href={link.url} class="text-blue-400">
                     <%= strip_protocol(link.url) %>
