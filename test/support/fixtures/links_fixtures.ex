@@ -8,11 +8,14 @@ defmodule PhoenixLiveviewTest.LinksFixtures do
   Generate a link.
   """
   def link_fixture(attrs \\ %{}) do
+    user_fixture = PhoenixLiveviewTest.UsersFixtures.user_fixture()
+
     {:ok, link} =
       attrs
       |> Enum.into(%{
         body: "some body",
-        url: "some url"
+        url: "some.url",
+        user_id: user_fixture.id
       })
       |> PhoenixLiveviewTest.Links.create_link()
 
